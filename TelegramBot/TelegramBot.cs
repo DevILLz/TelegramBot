@@ -2,10 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace TelegramBot
 {
@@ -20,14 +21,14 @@ namespace TelegramBot
         /// Колличество скаеенных ботом файлов в текущей сессии
         /// </summary>
         private int itemsCount = 0;
-
+        private WebClient weather;
         static private TelegramBotClient bot; // бот
         public ObservableCollection<ChatLog> BotMessageLog { get; set; } // лог чата текущей сессии 
         public TelegramBott(MainWindow W, string PathToken) // инициализация бота
         {
             this.BotMessageLog = new ObservableCollection<ChatLog>();
             this.w = W;
-
+            weather = new WebClient() {Encoding = Encoding.UTF8 };
             bot = new TelegramBotClient(File.ReadAllText(PathToken));
 
             bot.OnMessage += MessageListener;
@@ -99,7 +100,7 @@ namespace TelegramBot
             });
         }
 
-        string weatherToken = "";
+        
         /// <summary>
         /// Обработка сообщений пользователя
         /// </summary>
@@ -107,46 +108,84 @@ namespace TelegramBot
         /// <param name="chatId">ID пользователя</param>
         public void SendMessage(string messageText, long chatId)
         {
-            string Text = "";
+            
+            string text = "";
             switch (messageText)
             {
                 case "hello":
-                    Text = "Hello mate";
+                    text = "Hello mate";
                     break;
 
                 case "/downloadthings":
                     if (!downloadFlag)
                     {
                         downloadFlag = true;
-                        Text = "Теперь я могу скачивать присылаемые вами файлы";
+                        text = "Теперь я могу скачивать присылаемые вами файлы";
                     }
                     else
                     {
                         downloadFlag = false;
-                        Text = "Теперь я НЕ могу скачивать присылаемые вами файлы";
+                        text = "Теперь я НЕ могу скачивать присылаемые вами файлы";
                     }
                     break;
 
                 case "/weather": // погода, попытка взаимодействия с API стороннего сайта
-                    string city = "petersburg";
-                    Text = $@"http://api.openweathermap.org/data/2.5/find?q={city}&type=like&APPID=2628d760746e3fbfc599caaab455c698";
+                    string city = "yaroslavl";
+                    text = $" {WeatherParser(city)}\n\n " +
+                        $"Для вывода погоды других городов введите их название и страну латиницей.\n" +
+                        $"Например \"Moscow,ru\"" ;
                     break;
 
                 case "/help":
-                    Text = "Вам доступны команды: \n" +
+                    text = "Вам доступны команды: \n" +
                         "/DownloadThings - разшерить или запретить боту скачивание ваших файлов\n" +
                         "/weather - погода\n" +
-                        "3 - бла бла бла\n" +
-                        "4 - бла бла бла\n" +
-                        "5 - бла бла бла\n" +
-                        "6 - бла бла бла\n";
+                        "3 - test\n";
                     break;
 
                 default:
+                        text = $"{WeatherParser(messageText)}";                 
                     break;
             }
+            w.Dispatcher.Invoke(() =>
+            {
+                BotMessageLog.Add(
+                new ChatLog(
+                    text, 
+                    "Bot himself",
+                    chatId));
+                bot.SendTextMessageAsync(chatId, text);
+            });
+            
+        }
+        string weatherToken = "2628d760746e3fbfc599caaab455c698";// Решил не убирать в отдельный файл, т.к. заблокирую его после сдачи проекта
 
-            bot.SendTextMessageAsync(chatId, Text);
+        /// <summary>
+        /// Парсер openweathermap
+        /// </summary>
+        /// <param name="city">Требуемый город (латиницей)</param>
+        /// <returns></returns>
+        private string WeatherParser(string city)
+        {
+            string json;
+            try //обработка исключений
+            {
+                json = weather.DownloadString($@"http://api.openweathermap.org/data/2.5/find?q={city}&type=like&units=metric&lang=ru&APPID={weatherToken}");
+            }
+            catch 
+            {
+                return "Не удалось найти город, попробуйте еще раз";
+            }
+            if (Int32.Parse(JObject.Parse(json)["count"].ToString()) == 0) return "Не удалось найти город, попробуйте еще раз"; //обработка исключений
+
+            var cities = JObject.Parse(json)["list"].ToArray();
+            string text = $"Текущая температура в {city} {JObject.Parse(cities[0].ToString())["main"]["temp"]} с° \n" +
+                $"Ощущается как: {JObject.Parse(cities[0].ToString())["main"]["feels_like"]} с° \n" +
+                $"Ветер: {JObject.Parse(cities[0].ToString())["wind"]["speed"]} м/c \n" +
+                $"{JObject.Parse(JObject.Parse(cities[0].ToString())["weather"].ToArray()[0].ToString())["description"]}";
+            //в json включен массив с описанием погоды. Строка выше забирает из него первое значение.
+
+            return text;
         }
 
         /// <summary>

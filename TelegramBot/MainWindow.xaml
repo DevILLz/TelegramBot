@@ -11,23 +11,26 @@
             <RowDefinition Height="20"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0"><!--Бесполезная часть шаблона-->
             <MenuItem Header="File">
-                
+                <MenuItem Header="Тут нет ничего полезного"/>
             </MenuItem>
         </Menu>
+        <!--Вывод сообщений пользователей на экран-->
         <ListBox x:Name="logList" 
                  Grid.Row="1"
                  HorizontalAlignment="Stretch" 
                  Margin="5" 
-                 VerticalAlignment="Stretch" 
+                 VerticalAlignment="Stretch"
+                 MaxWidth="400" 
                  >
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="Black" Margin="5" BorderThickness="1" CornerRadius="10">
+                    <Border BorderBrush="Gray" Margin="3" BorderThickness="1" CornerRadius="10">
                         <StackPanel Margin="10">
-                            <TextBlock Text="{Binding FirstName}" Margin="0" FontSize="15"/>
-                            <TextBlock Text="{Binding Msg}" Margin="0" FontSize="20"/>
+                            <TextBlock Text="{Binding FirstName}" Margin="0" FontSize="15" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Msg}" Margin="0" FontSize="16" TextWrapping="Wrap" MaxWidth="300" />
                             <TextBlock Text="{Binding Time}" Margin="10 0" FontSize="10" Foreground="Gray" TextAlignment="Right"/>
                         </StackPanel>
                     </Border>
