@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0"><!--Бесполезная часть шаблона-->
             <MenuItem Header="File">
-                <MenuItem Header="Тут нет ничего полезного"/>
+                <MenuItem Header="Удалить" Click ="DeleteItem"/>
             </MenuItem>
         </Menu>
         <!--Вывод сообщений пользователей на экран-->
@@ -29,8 +29,11 @@
                 <DataTemplate>
                     <Border BorderBrush="Gray" Margin="3" BorderThickness="1" CornerRadius="10">
                         <StackPanel Margin="10">
+                            <!--Имя-->
                             <TextBlock Text="{Binding FirstName}" Margin="0" FontSize="15" FontWeight="Bold"/>
+                            <!--Сообщение-->
                             <TextBlock Text="{Binding Msg}" Margin="0" FontSize="16" TextWrapping="Wrap" MaxWidth="300" />
+                            <!--Время получения сообщения-->
                             <TextBlock Text="{Binding Time}" Margin="10 0" FontSize="10" Foreground="Gray" TextAlignment="Right"/>
                         </StackPanel>
                     </Border>
