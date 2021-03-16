@@ -22,19 +22,28 @@ namespace TelegramBot
         /// </summary>
         private int itemsCount = 0;
         private WebClient weather;
+        //private string weatherToken = "2628d760746e3fbfc599caaab455c698";
+        public string weatherToken = @"H:\OpenWeatherMap.txt";
         static private TelegramBotClient bot; // бот
         public ObservableCollection<ChatLog> BotMessageLog { get; set; } // лог чата текущей сессии 
+        
         public TelegramBott(MainWindow W, string PathToken) // инициализация бота
         {
+            if (File.Exists(weatherToken))
+            {
+                this.weatherToken = File.ReadAllText(weatherToken, Encoding.UTF8);
+            }
+            
             this.BotMessageLog = new ObservableCollection<ChatLog>();
             this.w = W;
             weather = new WebClient() {Encoding = Encoding.UTF8 };
-            bot = new TelegramBotClient(File.ReadAllText(PathToken));
+            bot = new TelegramBotClient(File.ReadAllText(PathToken, Encoding.UTF8));
 
             bot.OnMessage += MessageListener;
 
             bot.StartReceiving();
         }
+
 
         /// <summary>
         /// Взаимодействие с сообщением пользователя
@@ -99,7 +108,6 @@ namespace TelegramBot
                 }
             });
         }
-
         
         /// <summary>
         /// Обработка сообщений пользователя
@@ -158,7 +166,6 @@ namespace TelegramBot
             });
             
         }
-        string weatherToken = "2628d760746e3fbfc599caaab455c698";// Решил не убирать в отдельный файл, т.к. заблокирую его после сдачи проекта
 
         /// <summary>
         /// Парсер openweathermap
@@ -174,7 +181,7 @@ namespace TelegramBot
             }
             catch 
             {
-                return "Не удалось найти город, попробуйте еще раз";
+                return "Не удалось найти город, или сервис не доступен \n попробуйте еще раз";
             }
             if (Int32.Parse(JObject.Parse(json)["count"].ToString()) == 0) return "Не удалось найти город, попробуйте еще раз"; //обработка исключений
 

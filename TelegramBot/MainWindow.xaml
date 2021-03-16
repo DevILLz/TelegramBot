@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TelegramBot"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="400">
+        Title="MainWindow" Height="450" Width="400" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
@@ -13,7 +13,13 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0"><!--Бесполезная часть шаблона-->
             <MenuItem Header="File">
+                <MenuItem Header="Другой файл токена бота" Click ="New_bot"/>
+                <MenuItem Header="Другой файл токена погоды" Click ="Weather_new"/>
                 <MenuItem Header="Удалить" Click ="DeleteItem"/>
+                <MenuItem Header="Импорт" Click ="Import_button"/>
+                <MenuItem Header="Экспорт" Click ="Export_button"/>
+                
+                
             </MenuItem>
         </Menu>
         <!--Вывод сообщений пользователей на экран-->
@@ -27,14 +33,14 @@
             
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="Gray" Margin="3" BorderThickness="1" CornerRadius="10">
-                        <StackPanel Margin="10">
+                    <Border BorderBrush="Gray" Margin="2" BorderThickness="1" CornerRadius="8">
+                        <StackPanel Margin="8">
                             <!--Имя-->
-                            <TextBlock Text="{Binding FirstName}" Margin="0" FontSize="15" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding FirstName}" Margin="0" FontSize="12" FontWeight="Bold"/>
                             <!--Сообщение-->
-                            <TextBlock Text="{Binding Msg}" Margin="0" FontSize="16" TextWrapping="Wrap" MaxWidth="300" />
+                            <TextBlock Text="{Binding Msg}" Margin="0" FontSize="10" TextWrapping="Wrap" MaxWidth="300" />
                             <!--Время получения сообщения-->
-                            <TextBlock Text="{Binding Time}" Margin="10 0" FontSize="10" Foreground="Gray" TextAlignment="Right"/>
+                            <TextBlock Text="{Binding Time}" Margin="10 0" FontSize="8" Foreground="Gray" TextAlignment="Right"/>
                         </StackPanel>
                     </Border>
                 </DataTemplate>

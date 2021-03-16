@@ -8,6 +8,10 @@ namespace TelegramBot
 {
     public class ChatLog
     {
+        public ChatLog()
+        {
+
+        }
         /// <summary>
         /// Время получения сообщения
         /// </summary>
